@@ -6,5 +6,4 @@ class Person(TypedDict):
 
 new_person = Person(name="Alice", age=30)
 
-
 print(new_person)
