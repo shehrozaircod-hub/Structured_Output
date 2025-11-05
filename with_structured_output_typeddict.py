@@ -8,7 +8,6 @@ model = ChatOpenAI(model_name="gpt-5")
 
 
 # schema
-
 class Review(TypedDict):
     summary: str
     sentiment: str
