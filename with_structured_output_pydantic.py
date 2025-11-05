@@ -1,6 +1,7 @@
 from langchain_openai import ChatOpenAI
 from dotenv import load_dotenv
-from typing import TypedDict, Annotated, Optional
+from typing import TypedDict, Annotated, Optional, Literal
+from pydantic import BaseModel, Field
 
 load_dotenv()
 
@@ -8,12 +9,13 @@ model = ChatOpenAI(model_name="gpt-5")
 
 
 # schema
-class Review(TypedDict):
-    key_themes: Annotated[list[str], 'Write down the key themes discussed in the review in a list']
-    summary: Annotated[str,'A brief summary of the review']
-    sentiment: Annotated[str,'Sentiment of the review, e.g., positive, negative, neutral']
-    pros: Annotated[Optional[list[str]], 'List the pros mentioned in the review inside a list']
-    cons: Annotated[Optional[list[str]], 'List the cons mentioned in the review inside a list']
+class Review(BaseModel):
+    key_themes: list[str] = Field(description='Write down the key themes discussed in the review in a list')
+    summary: str = Field(description='A brief summary of the review')
+    sentiment: Literal['pos', 'neg'] = Field(description='Sentiment of the review, e.g., positive, negative')
+    pros: Optional[list[str]] = Field(default=None, description='List the pros mentioned in the review inside a list') 
+    cons: Optional[list[str]] = Field(default=None, description='List the cons mentioned in the review inside a list')
+    name: Optional[str] = Field(default=None, description='Name of the reviewer') 
 
 structured_model = model.with_structured_output(Review)
 
@@ -38,8 +40,12 @@ Expensive compared to other flagship phones
 Review by Nitish Singh """)
 
 print(result)
-print(f"Key Themes: {result['key_themes']}")
-print(f"Summary: {result['summary']}")
-print(f"Sentiment: {result['sentiment']}")
-print(f"Pros: {result['pros']}")
-print(f"Cons: {result['cons']}")
+
+# Converting to dictionary
+
+dict_result = dict(result)
+print(f"Key Themes: {dict_result['key_themes']}")
+print(f"Summary: {dict_result['summary']}")
+print(f"Sentiment: {dict_result['sentiment']}")
+print(f"Pros: {dict_result['pros']}")
+print(f"Cons: {dict_result['cons']}")
